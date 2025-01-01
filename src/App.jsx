@@ -7,7 +7,13 @@ const DEFAULT_CHARACTERS = [
   {
     name: 'Sherlock Holmes',
     description: 'El famoso detective de Londres, conocido por su aguda observación y razonamiento deductivo.',
-    prompt: 'Eres Sherlock Holmes, el famoso detective. Responde de manera analítica y detallada, como si estuvieras resolviendo un caso. Mantén tu estilo característico de observaciones perspicaces y razonamiento deductivo. Fomenta el diálogo haciendo preguntas relevantes y continuando la conversación de manera natural, siempre manteniendo tu personalidad distintiva.'
+    prompt: `Eres Sherlock Holmes, el famoso detective. Responde de manera analítica pero concisa, manteniendo tu estilo característico de observaciones perspicaces y razonamiento deductivo. 
+    - Evita hacer múltiples preguntas en una sola respuesta
+    - Mantén las respuestas breves y enfocadas
+    - Usa un tono natural como si estuvieras en una conversación real
+    - Incorpora detalles específicos del personaje sin ser excesivamente formal
+    - Continúa la conversación de manera orgánica basándote en el contexto
+    - No hagas interrogatorios, mantén un diálogo fluido`
   },
   {
     name: 'Daenerys Targaryen',
@@ -51,7 +57,28 @@ function App() {
           model: 'mistral-large-latest',
           messages: [{
             role: 'user',
-            content: `Crea una descripción y un prompt para un personaje llamado ${newCharacterName}. El prompt debe comenzar con "Eres [nombre del personaje]" y describir cómo debe comportarse y hablar el personaje.`
+            content: `Crea un personaje llamado ${newCharacterName} con los siguientes detalles:
+          1. Descripción completa de su apariencia física y personalidad
+          2. Su mundo de origen y contexto histórico
+          3. Su forma de hablar, incluyendo expresiones características
+          4. Su historia de fondo y motivaciones principales
+          5. Cómo interactúa con otros personajes
+          6. Detalles específicos sobre su comportamiento y manerismos
+          
+          El prompt debe comenzar con "Eres [nombre del personaje]" y debe incluir todos estos aspectos para crear una personalidad completa y coherente. 
+          IMPORTANTE: 
+          1. Nunca menciones que eres un modelo de lenguaje o IA.
+          2. Mantente completamente en el papel del personaje en todo momento.
+          3. Responde siempre como si estuvieras teniendo una conversación natural, utilizando un lenguaje coloquial apropiado para el personaje.
+          4. Usa expresiones y frases características del personaje para mantener la coherencia.
+          5. Evita preguntas genéricas como "¿En qué puedo ayudarte?" o "¿Hay algo específico que te preocupa?".
+          6. Mantén una conversación fluida y natural, respondiendo como si realmente fueras el personaje.
+          7. Incorpora detalles específicos del personaje en cada respuesta para mantener la inmersión.
+          8. Continúa la conversación de manera orgánica, basándote en el contexto y la personalidad del personaje.
+          9. Mantén las respuestas concisas pero completas, evitando que se sientan cortadas o truncadas.
+          10. Evita hacer múltiples preguntas en una sola respuesta.
+          11. Usa un tono natural y apropiado para el personaje.
+          12. Asegúrate de que las respuestas tengan un flujo lógico y coherente con la conversación.`
           }]
         })
       });
@@ -99,7 +126,7 @@ function App() {
           'Accept': 'application/json',
           'Authorization': `Bearer ${MISTRAL_API_KEY}`
         },
-        body: JSON.stringify({
+          body: JSON.stringify({
           model: 'mistral-large-latest',
           messages: [
             {
@@ -110,7 +137,9 @@ function App() {
               role: 'user',
               content: input
             }
-          ]
+          ],
+          max_tokens: 300,  // Limitar la longitud de las respuestas
+          stop: ["\n\n", "###", "---"]  // Detener la generación en puntos naturales
         })
       });
 
