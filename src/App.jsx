@@ -149,19 +149,41 @@ function App() {
       maxWidth: 800, 
       margin: 'auto', 
       p: 2,
-      height: 'calc(100vh - 32px)',
+      height: '100vh',
       display: 'flex',
-      flexDirection: 'column'
+      flexDirection: 'column',
+      '@media (max-width: 600px)': {
+        p: 1,
+        maxWidth: '100%'
+      }
     }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Typography variant="h4">
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        mb: 2,
+        '@media (max-width: 600px)': {
+          mb: 1
+        }
+      }}>
+        <Typography variant="h4" sx={{
+          '@media (max-width: 600px)': {
+            fontSize: '1.5rem'
+          }
+        }}>
           RoleApp
         </Typography>
         <Box>
           <Button 
             variant="contained" 
             onClick={() => setTabIndex(tabIndex === 0 ? 1 : 0)}
-            sx={{ mr: 1 }}
+            sx={{ 
+              mr: 1,
+              '@media (max-width: 600px)': {
+                fontSize: '0.8rem',
+                padding: '6px 12px'
+              }
+            }}
           >
             {tabIndex === 0 ? 'Crear Personaje' : 'Seleccionar Personaje'}
           </Button>
