@@ -244,75 +244,71 @@ function App() {
         }}>
           RoleApp
         </Typography>
-        <Box>
-          <Button 
-            variant="contained" 
-            onClick={() => setTabIndex(tabIndex === 0 ? 1 : 0)}
-            sx={{ 
-              mr: 1,
-              '@media (max-width: 600px)': {
-                fontSize: '0.8rem',
-                padding: '6px 12px'
-              }
-            }}
-          >
-            {tabIndex === 0 ? 'Crear Personaje' : 'Seleccionar Personaje'}
-          </Button>
-          <IconButton onClick={handleNewChat}>
-            <Refresh />
-          </IconButton>
-        </Box>
+        <Button 
+          variant="contained" 
+          onClick={() => setTabIndex(tabIndex === 0 ? 1 : 0)}
+          sx={{ 
+            mr: 1,
+            '@media (max-width: 600px)': {
+              fontSize: '0.8rem',
+              padding: '6px 12px'
+            }
+          }}
+        >
+          {tabIndex === 0 ? 'Crear Personaje' : 'Seleccionar Personaje'}
+        </Button>
       </Box>
 
       {tabIndex === 0 ? (
         <Box sx={{ mb: 2 }}>
-          <Autocomplete
-            value={character}
-            onChange={(event, newValue) => {
-              if (newValue) {
-                setCharacter(newValue);
-                setMessages([]);
-              }
-            }}
-            options={characters}
-            getOptionLabel={(option) => option.name}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Buscar personaje"
-                InputProps={{
-                  ...params.InputProps,
-                  startAdornment: (
-                    <>
-                      <Search sx={{ color: 'text.secondary', mr: 1 }} />
-                      {params.InputProps.startAdornment}
-                    </>
-                  )
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box sx={{ flex: 0.9 }}>
+              <Autocomplete
+                value={character}
+                onChange={(event, newValue) => {
+                  if (newValue) {
+                    setCharacter(newValue);
+                    setMessages([]);
+                  }
                 }}
+                options={characters}
+                getOptionLabel={(option) => option.name}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Buscar personaje"
+                    InputProps={{
+                      ...params.InputProps,
+                      startAdornment: (
+                        <>
+                          <Search sx={{ color: 'text.secondary', mr: 1 }} />
+                          {params.InputProps.startAdornment}
+                        </>
+                      )
+                    }}
+                    fullWidth
+                  />
+                )}
+                renderOption={(props, option) => (
+                  <Box component="li" {...props} sx={{ py: 2 }}>
+                    <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
+                      {option.name}
+                    </Typography>
+                  </Box>
+                )}
               />
-            )}
-            renderOption={(props, option) => (
-              <Box component="li" {...props} sx={{ py: 2 }}>
-                <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                  {option.name}
-                </Typography>
-              </Box>
-            )}
-            sx={{ mb: 2 }}
-          />
-          
-          <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
-            <Button
-              variant="outlined"
-              color="error"
-              startIcon={<Delete />}
-              onClick={() => {
-                setCharacters(prev => prev.filter(c => c.name !== character.name));
-                setCharacter(characters[0]);
-              }}
-            >
-              Eliminar personaje
-            </Button>
+            </Box>
+            <Box sx={{ flex: 0.1, display: 'flex', justifyContent: 'center' }}>
+              <IconButton
+                color="error"
+                onClick={() => {
+                  setCharacters(prev => prev.filter(c => c.name !== character.name));
+                  setCharacter(characters[0]);
+                }}
+              >
+                <Delete />
+              </IconButton>
+            </Box>
           </Box>
         </Box>
       ) : (
@@ -341,7 +337,29 @@ function App() {
         </Box>
       )}
       
-      <Box sx={{ flex: 1, overflowY: 'auto', mb: 2 }}>
+      <Box sx={{ 
+        flex: 1, 
+        overflowY: 'auto', 
+        mb: 2,
+        border: '1px solid #e0e0e0',
+        borderRadius: '4px',
+        position: 'relative'
+      }}>
+        <IconButton 
+          onClick={handleNewChat}
+          sx={{
+            position: 'absolute',
+            top: 8,
+            left: 8,
+            zIndex: 1,
+            backgroundColor: 'rgba(158, 158, 158, 0.5)',
+            '&:hover': {
+              backgroundColor: 'rgba(158, 158, 158, 0.7)'
+            }
+          }}
+        >
+          <Refresh />
+        </IconButton>
         <List>
           {messages.map((msg, index) => (
             <ListItem key={index} sx={{ 
