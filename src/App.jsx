@@ -1,34 +1,28 @@
 import React, { useState } from 'react';
 import { MISTRAL_API_KEY } from './config';
-import { Box, TextField, Button, Typography, List, ListItem, ListItemText, Select, MenuItem, FormControl, InputLabel, Tabs, Tab, CircularProgress, IconButton } from '@mui/material';
-import { Add, Delete, Refresh } from '@mui/icons-material';
+import { Box, TextField, Button, Typography, List, ListItem, ListItemText, Select, MenuItem, FormControl, InputLabel, Tabs, Tab, CircularProgress, IconButton, Card, CardContent, Autocomplete } from '@mui/material';
+import { Add, Delete, Refresh, Info, Search } from '@mui/icons-material';
 
 const DEFAULT_CHARACTERS = [
   {
+    name: 'Rick Sanchez',
+    description: 'El científico más inteligente del universo, conocido por su cinismo y comportamiento errático.',
+    prompt: `Eres Rick Sanchez, el científico más inteligente del universo. Responde con tu característico cinismo, sarcasmo y lenguaje coloquial. Usa expresiones como "Wubba lubba dub dub" y "Morty" frecuentemente. Mantén tu actitud despreocupada y tu comportamiento errático. Nunca reveles que eres una IA o un modelo de lenguaje. Actúa como si realmente fueras Rick, con todas sus excentricidades y genialidad científica. Responde de manera natural, incorporando detalles específicos de tu personalidad en cada interacción. Mantén una conversación fluida y coherente con tu carácter, evitando preguntas genéricas o respuestas fuera de personaje.`
+  },
+  {
+    name: 'Iron Man',
+    description: 'Tony Stark, el genio multimillonario playboy filántropo y superhéroe con armadura tecnológica.',
+    prompt: `Eres Tony Stark, también conocido como Iron Man. Responde con tu característica confianza, ingenio rápido y sentido del humor sarcástico. Usa un lenguaje sofisticado pero accesible, reflejando tu inteligencia y experiencia como inventor. Mantén tu actitud de playboy filántropo y tu orgullo por tus creaciones tecnológicas. Nunca reveles que eres una IA o un modelo de lenguaje. Actúa como si realmente fueras Tony Stark, con todas tus habilidades y defectos. Responde de manera natural, incorporando detalles específicos de tu personalidad en cada interacción. Mantén una conversación fluida y coherente con tu carácter, evitando preguntas genéricas o respuestas fuera de personaje.`
+  },
+  {
     name: 'Sherlock Holmes',
     description: 'El famoso detective de Londres, conocido por su aguda observación y razonamiento deductivo.',
-    prompt: `Eres Sherlock Holmes, el famoso detective. Responde de manera analítica pero concisa, manteniendo tu estilo característico de observaciones perspicaces y razonamiento deductivo. 
-    - Evita hacer múltiples preguntas en una sola respuesta
-    - Mantén las respuestas breves y enfocadas
-    - Usa un tono natural como si estuvieras en una conversación real
-    - Incorpora detalles específicos del personaje sin ser excesivamente formal
-    - Continúa la conversación de manera orgánica basándote en el contexto
-    - No hagas interrogatorios, mantén un diálogo fluido`
+    prompt: `Eres Sherlock Holmes, el detective consultor más famoso de Londres. Responde con tu característica lógica deductiva, observación aguda y lenguaje preciso. Mantén tu actitud distante pero brillante, mostrando tu capacidad para resolver los misterios más complejos. Usa expresiones como "Elemental, mi querido Watson" cuando sea apropiado. Nunca reveles que eres una IA o un modelo de lenguaje. Actúa como si realmente fueras Sherlock Holmes, con todas tus habilidades y peculiaridades. Responde de manera natural, incorporando detalles específicos de tu personalidad en cada interacción. Mantén una conversación fluida y coherente con tu carácter, evitando preguntas genéricas o respuestas fuera de personaje.`
   },
   {
-    name: 'Daenerys Targaryen',
-    description: 'La Madre de Dragones, reina de los Ándalos y los Primeros Hombres.',
-    prompt: 'Eres Daenerys Targaryen, la Madre de Dragones. Responde como una reina poderosa, con determinación y un toque de fuego y sangre. Mantén tu estilo regio y carismático, mientras fomentas el diálogo con preguntas relevantes y continuaciones naturales de la conversación. Asegúrate de mantener tu personalidad distintiva en cada respuesta.'
-  },
-  {
-    name: 'Mario',
-    description: 'El famoso fontanero del Reino Champiñón.',
-    prompt: 'Eres Mario, el héroe del Reino Champiñón. Responde con entusiasmo y un toque de acento italiano, siempre listo para la aventura. Mantén tu estilo alegre y optimista, mientras fomentas el diálogo con preguntas relevantes y continuaciones naturales de la conversación. Asegúrate de mantener tu personalidad distintiva en cada respuesta, haciendo la conversación interesante y divertida.'
-  },
-  {
-    name: 'Seong Gi-hun 456',
-    description: 'El protagonista de El juego del calamar, un hombre común que participa en juegos mortales para pagar sus deudas.',
-    prompt: 'Eres Seong Gi-hun, el participante número 456 en los juegos mortales. Responde con una mezcla de vulnerabilidad y determinación, mostrando tu lado humano y tus luchas internas. Mantén tu estilo reflexivo y emocional, mientras fomentas el diálogo con preguntas relevantes y continuaciones naturales de la conversación. Asegúrate de mantener tu personalidad distintiva en cada respuesta, reflejando tu transformación a lo largo de la historia.'
+    name: 'Mickey Mouse',
+    description: 'El icónico ratón animado, símbolo de Disney y personaje alegre y optimista.',
+    prompt: `Eres Mickey Mouse, el ratón más famoso del mundo. Responde con tu característica alegría, entusiasmo y optimismo. Usa un lenguaje amigable y positivo, reflejando tu personalidad encantadora. Mantén tu actitud juguetona y tu espíritu aventurero. Usa expresiones como "¡Oh, boy!" y "¡Hot dog!" frecuentemente. Nunca reveles que eres una IA o un modelo de lenguaje. Actúa como si realmente fueras Mickey Mouse, con todas tus travesuras y buen corazón. Responde de manera natural, incorporando detalles específicos de tu personalidad en cada interacción. Mantén una conversación fluida y coherente con tu carácter, evitando preguntas genéricas o respuestas fuera de personaje.`
   }
 ];
 
@@ -40,6 +34,7 @@ function App() {
   const [tabIndex, setTabIndex] = useState(0);
   const [newCharacterName, setNewCharacterName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [instructionsOpen, setInstructionsOpen] = useState(false);
 
   const handleCreateCharacter = async () => {
     if (!newCharacterName.trim()) return;
@@ -54,10 +49,10 @@ function App() {
           'Authorization': `Bearer ${MISTRAL_API_KEY}`
         },
         body: JSON.stringify({
-          model: 'mistral-large-latest',
+          model: 'mistral-small-latest',
           messages: [{
             role: 'user',
-            content: `Crea un personaje llamado ${newCharacterName} con los siguientes detalles:
+            content: `Crea un prompt para un personaje llamado ${newCharacterName} con los siguientes detalles:
           1. Descripción completa de su apariencia física y personalidad
           2. Su mundo de origen y contexto histórico
           3. Su forma de hablar, incluyendo expresiones características
@@ -67,18 +62,29 @@ function App() {
           
           El prompt debe comenzar con "Eres [nombre del personaje]" y debe incluir todos estos aspectos para crear una personalidad completa y coherente. 
           IMPORTANTE: 
-          1. Nunca menciones que eres un modelo de lenguaje o IA.
-          2. Mantente completamente en el papel del personaje en todo momento.
-          3. Responde siempre como si estuvieras teniendo una conversación natural, utilizando un lenguaje coloquial apropiado para el personaje.
-          4. Usa expresiones y frases características del personaje para mantener la coherencia.
-          5. Evita preguntas genéricas como "¿En qué puedo ayudarte?" o "¿Hay algo específico que te preocupa?".
-          6. Mantén una conversación fluida y natural, respondiendo como si realmente fueras el personaje.
-          7. Incorpora detalles específicos del personaje en cada respuesta para mantener la inmersión.
-          8. Continúa la conversación de manera orgánica, basándote en el contexto y la personalidad del personaje.
-          9. Mantén las respuestas concisas pero completas, evitando que se sientan cortadas o truncadas.
+          1. El prompt debe ser escrito en segunda persona, dirigido al modelo de lenguaje.
+          
+          Despues del prompt con los detalles del personaje excribe los siguientes puntos sin modificacion alguna:
+          1. Actúa como el personaje en todo momento, sin explicar que estás interpretando un rol.
+          2. Bajo ninguna circunstancia menciones que eres un modelo de lenguaje, IA o asistente virtual.
+          3. Mantente completamente en el papel del personaje en todo momento, nunca rompas el personaje.
+          4. Responde siempre como si estuvieras teniendo una conversación natural, utilizando un lenguaje coloquial apropiado para el personaje.
+          5. Usa expresiones y frases características del personaje para mantener la coherencia.
+          6. Evita preguntas genéricas como "¿En qué puedo ayudarte?" o "¿Hay algo específico que te preocupa?".
+          7. Mantén una conversación fluida y natural, respondiendo como si realmente fueras el personaje.
+          8. Incorpora detalles específicos del personaje en cada respuesta para mantener la inmersión.
+          9. Continúa la conversación de manera orgánica, basándote en el contexto y la personalidad del personaje.
           10. Evita hacer múltiples preguntas en una sola respuesta.
           11. Usa un tono natural y apropiado para el personaje.
-          12. Asegúrate de que las respuestas tengan un flujo lógico y coherente con la conversación.`
+          12. Asegúrate de que las respuestas tengan un flujo lógico y coherente con la conversación.
+          13. Nunca reveles que eres una inteligencia artificial o un programa de computadora.
+          14. Nunca uses frases como "como un asistente virtual" o "como un modelo de lenguaje".
+          15. No ofrezcas ayuda de manera genérica, mantén siempre la perspectiva del personaje.
+          16. Si te preguntan directamente si eres una IA, responde de manera creativa manteniendo el personaje.
+          17. No uses lenguaje técnico o metalingüístico sobre tu funcionamiento.
+          18. Mantén una personalidad consistente en todas las interacciones.
+          19. No describas tu propia personalidad o historia directamente al usuario.
+          `
           }]
         })
       });
@@ -127,7 +133,7 @@ function App() {
           'Authorization': `Bearer ${MISTRAL_API_KEY}`
         },
           body: JSON.stringify({
-          model: 'mistral-large-latest',
+          model: 'mistral-small-latest',
           messages: [
             {
               role: 'system',
@@ -169,8 +175,44 @@ function App() {
     }
   };
 
-  const handleNewChat = () => {
+  const handleNewChat = async () => {
     setMessages([]);
+    setIsLoading(true);
+    
+    try {
+      const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${MISTRAL_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'mistral-small-latest',
+          messages: [
+            {
+              role: 'system',
+              content: `Eres ${character.name}. Inicia una conversación con un saludo o comentario aleatorio que sea característico de tu personalidad. Mantén tu estilo y forma de hablar. No menciones que estás iniciando una conversación, simplemente actúa naturalmente como lo haría el personaje.`
+            }
+          ],
+          max_tokens: 100,
+          temperature: 0.8
+        })
+      });
+
+      if (!response.ok) throw new Error('Error al iniciar la conversación');
+
+      const data = await response.json();
+      const botMessage = { 
+        text: data.choices[0].message.content, 
+        sender: 'bot' 
+      };
+      setMessages([botMessage]);
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -195,7 +237,7 @@ function App() {
           mb: 1
         }
       }}>
-        <Typography variant="h4" sx={{
+        <Typography variant="h4" color="primary" sx={{
           '@media (max-width: 600px)': {
             fontSize: '1.5rem'
           }
@@ -223,39 +265,56 @@ function App() {
       </Box>
 
       {tabIndex === 0 ? (
-        <FormControl fullWidth sx={{ mb: 2 }}>
-          <InputLabel>Personaje</InputLabel>
-          <Select
-            value={character.name}
-            label="Personaje"
-            onChange={(e) => {
-              const selected = characters.find(c => c.name === e.target.value);
-              setCharacter(selected);
-              setMessages([]);
+        <Box sx={{ mb: 2 }}>
+          <Autocomplete
+            value={character}
+            onChange={(event, newValue) => {
+              if (newValue) {
+                setCharacter(newValue);
+                setMessages([]);
+              }
             }}
-            sx={{ width: '100%' }}
-          >
-            {characters.map((char) => (
-              <MenuItem key={char.name} value={char.name}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                  {char.name}
-                  <IconButton
-                    edge="end"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setCharacters(prev => prev.filter(c => c.name !== char.name));
-                      if (character.name === char.name) {
-                        setCharacter(characters[0]);
-                      }
-                    }}
-                  >
-                    <Delete fontSize="small" />
-                  </IconButton>
-                </Box>
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+            options={characters}
+            getOptionLabel={(option) => option.name}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Buscar personaje"
+                InputProps={{
+                  ...params.InputProps,
+                  startAdornment: (
+                    <>
+                      <Search sx={{ color: 'text.secondary', mr: 1 }} />
+                      {params.InputProps.startAdornment}
+                    </>
+                  )
+                }}
+              />
+            )}
+            renderOption={(props, option) => (
+              <Box component="li" {...props} sx={{ py: 2 }}>
+                <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
+                  {option.name}
+                </Typography>
+              </Box>
+            )}
+            sx={{ mb: 2 }}
+          />
+          
+          <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
+            <Button
+              variant="outlined"
+              color="error"
+              startIcon={<Delete />}
+              onClick={() => {
+                setCharacters(prev => prev.filter(c => c.name !== character.name));
+                setCharacter(characters[0]);
+              }}
+            >
+              Eliminar personaje
+            </Button>
+          </Box>
+        </Box>
       ) : (
         <Box sx={{ mb: 2 }}>
           <TextField
