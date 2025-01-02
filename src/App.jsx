@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MISTRAL_API_KEY } from './config';
 import { Box, TextField, Button, Typography, List, ListItem, ListItemText, Select, MenuItem, FormControl, InputLabel, Tabs, Tab, CircularProgress, IconButton, Card, CardContent, Autocomplete } from '@mui/material';
-import { Add, Delete, Refresh, Info, Search } from '@mui/icons-material';
+import { Add, Delete, Refresh, Info, Search, ArrowDownward } from '@mui/icons-material';
 
 const DEFAULT_CHARACTERS = [
   {
@@ -35,6 +35,26 @@ function App() {
   const [newCharacterName, setNewCharacterName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [instructionsOpen, setInstructionsOpen] = useState(false);
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (messagesContainerRef.current) {
+        const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
+        setShowScrollButton(scrollTop + clientHeight < scrollHeight - 100);
+      }
+    };
+
+    const container = messagesContainerRef.current;
+    container?.addEventListener('scroll', handleScroll);
+    return () => container?.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleCreateCharacter = async () => {
     if (!newCharacterName.trim()) return;
@@ -349,14 +369,34 @@ function App() {
         </Box>
       )}
       
-      <Box sx={{ 
-        flex: 1, 
-        overflowY: 'auto', 
-        mb: 2,
-        border: '1px solid #e0e0e0',
-        borderRadius: '4px',
-        position: 'relative'
-      }}>
+      <Box 
+        ref={messagesContainerRef}
+        sx={{ 
+          flex: 1, 
+          overflowY: 'auto', 
+          mb: 2,
+          border: '1px solid #616161',
+          borderRadius: '4px',
+          position: 'relative'
+        }}
+      >
+        {showScrollButton && (
+          <IconButton 
+            onClick={scrollToBottom}
+            sx={{
+              position: 'absolute',
+              bottom: 16,
+              right: 16,
+              zIndex: 1,
+              backgroundColor: 'rgba(158, 158, 158, 0.5)',
+              '&:hover': {
+                backgroundColor: 'rgba(158, 158, 158, 0.7)'
+              }
+            }}
+          >
+            <ArrowDownward />
+          </IconButton>
+        )}
         <IconButton 
           onClick={handleNewChat}
           sx={{
@@ -386,11 +426,18 @@ function App() {
                   p: 2,
                   borderRadius: 2,
                   maxWidth: '70%',
-                  wordBreak: 'break-word'
+                  wordBreak: 'break-word',
+                  '@media (max-width: 600px)': {
+                    '& .MuiTypography-root': {
+                      fontSize: '0.9em',
+                      lineHeight: 1.25
+                    }
+                  }
                 }}
               />
             </ListItem>
           ))}
+          <div ref={messagesEndRef} />
         </List>
       </Box>
 
