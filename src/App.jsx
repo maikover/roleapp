@@ -27,10 +27,16 @@ const DEFAULT_CHARACTERS = [
 ];
 
 function App() {
+  // Cargar datos guardados al iniciar
+  const loadFromLocalStorage = (key, defaultValue) => {
+    const saved = localStorage.getItem(key);
+    return saved ? JSON.parse(saved) : defaultValue;
+  };
+
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState([]);
-  const [characters, setCharacters] = useState(DEFAULT_CHARACTERS);
-  const [character, setCharacter] = useState(DEFAULT_CHARACTERS[0]);
+  const [messages, setMessages] = useState(loadFromLocalStorage('messages', []));
+  const [characters, setCharacters] = useState(loadFromLocalStorage('characters', DEFAULT_CHARACTERS));
+  const [character, setCharacter] = useState(loadFromLocalStorage('selectedCharacter', DEFAULT_CHARACTERS[0]));
   const [tabIndex, setTabIndex] = useState(0);
   const [newCharacterName, setNewCharacterName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
