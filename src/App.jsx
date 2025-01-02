@@ -220,12 +220,15 @@ function App() {
       maxWidth: 800, 
       margin: 'auto', 
       p: 2,
-      height: '100vh',
+      height: 'calc(100vh - env(safe-area-inset-top))',
       display: 'flex',
       flexDirection: 'column',
+      overflow: 'hidden',
+      backgroundColor: '#1a1a2e',
       '@media (max-width: 600px)': {
         p: 1,
-        maxWidth: '100%'
+        maxWidth: '100%',
+        height: 'calc(100vh - env(safe-area-inset-top) - 56px)'
       }
     }}>
       <Box sx={{ 
@@ -237,13 +240,22 @@ function App() {
           mb: 1
         }
       }}>
-        <Typography variant="h4" color="primary" sx={{
-          '@media (max-width: 600px)': {
-            fontSize: '1.5rem'
-          }
-        }}>
-          RoleApp
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <img src="/favicon.ico" alt="logo" style={{ width: 40, height: 40 }} />
+          <Typography variant="h4" sx={{
+            fontWeight: 'bold',
+            '@media (max-width: 600px)': {
+              fontSize: '1.5rem'
+            }
+          }}>
+            <span style={{ color: 'white' }}>Role</span>
+            <span style={{ 
+              background: 'linear-gradient(135deg, #7c4dff, #448aff)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent'
+            }}>App</span>
+          </Typography>
+        </Box>
         <Button 
           variant="contained" 
           onClick={() => setTabIndex(tabIndex === 0 ? 1 : 0)}
