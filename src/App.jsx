@@ -34,9 +34,14 @@ function App() {
   };
 
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState(loadFromLocalStorage('messages', []));
-  const [characters, setCharacters] = useState(loadFromLocalStorage('characters', DEFAULT_CHARACTERS));
-  const [character, setCharacter] = useState(loadFromLocalStorage('selectedCharacter', DEFAULT_CHARACTERS[0]));
+  const [messages, setMessages] = useState(() => loadFromLocalStorage('messages', []));
+  const [characters, setCharacters] = useState(() => loadFromLocalStorage('characters', DEFAULT_CHARACTERS));
+  const [character, setCharacter] = useState(() => {
+    const savedCharacter = loadFromLocalStorage('selectedCharacter', DEFAULT_CHARACTERS[0]);
+    // Verificar que el personaje seleccionado exista en la lista de personajes
+    const charactersList = loadFromLocalStorage('characters', DEFAULT_CHARACTERS);
+    return charactersList.find(c => c.name === savedCharacter.name) || DEFAULT_CHARACTERS[0];
+  });
   const [tabIndex, setTabIndex] = useState(0);
   const [newCharacterName, setNewCharacterName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -386,14 +391,18 @@ function App() {
           position: 'relative'
         }}
       >
-        {showScrollButton && (
+        <Box sx={{
+          position: 'fixed',
+          bottom: 80,
+          right: 16,
+          zIndex: 1,
+          transition: 'opacity 0.3s ease',
+          opacity: showScrollButton ? 1 : 0,
+          pointerEvents: showScrollButton ? 'auto' : 'none'
+        }}>
           <IconButton 
             onClick={scrollToBottom}
             sx={{
-              position: 'absolute',
-              bottom: 16,
-              right: 16,
-              zIndex: 1,
               backgroundColor: 'rgba(158, 158, 158, 0.5)',
               '&:hover': {
                 backgroundColor: 'rgba(158, 158, 158, 0.7)'
@@ -402,7 +411,7 @@ function App() {
           >
             <ArrowDownward />
           </IconButton>
-        )}
+        </Box>
         <IconButton 
           onClick={handleNewChat}
           sx={{
